@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Inline-Wrapper
+version:             0.01
+abstract:            Convenient module wrapper/loader routines for Inline.pm
+license:             perl
+author:              
+    - Jason McManus (INFIDEL) <infidel@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    File::Temp:                    0
+    Inline:                        0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
