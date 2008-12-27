@@ -21,7 +21,7 @@ use vars qw( $TRUE $FALSE $VERSION );
 ### VARS
 ###
 
-($VERSION) = q$Revision: 4 $ =~ /(\d+)/;
+($VERSION) = q$Revision: 6 $ =~ /(\d+)/;
 *TRUE    = \1;
 *FALSE   = \0;
 
@@ -96,11 +96,11 @@ sub _load
 
     # Try to bind via Inline::$language
     $self->_delete_namespace();
-    my $code = sprintf( 'package %s::%s; '                       .
-                        'use Inline; '                           .
-                        'Inline->bind( %s => $module_src ); '    .
-                        'package %s; '                           .
-                        'return( grep { !/^(?:BEGIN|ISA)$/ } keys %%%s::%s:: )',
+    my $code = sprintf(q#package %s::%s;
+                         use Inline;
+                         Inline->bind( %s => $module_src );
+                         package %s;
+                         return( grep { !/^(?:BEGIN|ISA)$/ } keys %%%s::%s:: )#,
                         __PACKAGE__,        $namespace,
                         $self->language(),
                         __PACKAGE__,

@@ -20,7 +20,7 @@ use Inline::Wrapper::Module;                        # individual code modules
 ### VARS
 ###
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 *TRUE    = \1;
 *FALSE   = \0;
 
@@ -317,10 +317,28 @@ Inline::Wrapper - Convenient module wrapper/loader routines for Inline.pm
 
 =head1 SYNOPSIS
 
+sample.pl:
+
  use Inline::Wrapper;
 
- $poe_kernel->run();
+ my $inline = Inline::Wrapper->new(
+    language    => 'C',
+    base_dir    => '.',
+ );
+
+ my @symbols = $inline->load( 'sample_module' );
+
+ my @retvals = $inline->run( 'sample_module', 'sample_func', 2, 3 );
+
+ print $retvals[0], "\n";
+
  exit(0);
+
+sample_module.c:
+
+ int sample_func( int arg1, int arg2 ) {
+     return arg1 * arg2;
+ }
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Inline-Wrapper
-version:             0.01
+version:             0.02
 abstract:            Convenient module wrapper/loader routines for Inline.pm
 license:             perl
 author:              
