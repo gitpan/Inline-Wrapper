@@ -2,7 +2,7 @@
 #
 #   Test Inline::Foo module creation
 #
-#   infi/08
+#   $Id: 21-Inline-C.t 8 2008-12-27 19:16:54Z infidel $
 #
 
 use Test::More tests => 9;

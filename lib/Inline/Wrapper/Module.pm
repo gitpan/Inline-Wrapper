@@ -4,14 +4,14 @@ package Inline::Wrapper::Module;
 #
 #   Individual module handler object
 #
-#   infi/08
+#   $Id: Module.pm 8 2008-12-27 19:16:54Z infidel $
 #
 #   POD documentation after __END__
 #
 
 use strict;
 use warnings;
-use Carp qw( croak );
+use Carp qw( carp croak );
 use Data::Dumper;
 use base qw( Inline::Wrapper );
 use Inline;
@@ -21,12 +21,13 @@ use vars qw( $TRUE $FALSE $VERSION );
 ### VARS
 ###
 
-($VERSION) = q$Revision: 6 $ =~ /(\d+)/;
+($VERSION) = q$Revision: 8 $ =~ /(\d+)/;
 *TRUE    = \1;
 *FALSE   = \0;
 
 my $PARAMS = {
     module_name => sub { $_[0] },
+    lang_ext    => sub { $_[0] },
 };
 
 ###
@@ -110,7 +111,7 @@ sub _load
     # http://perlmonks.org/index.pl?node_id=732598
     my @symbols = eval $code;
     chomp $@ if( $@ );
-    warn "Error compiling " . $self->_module_path() . ": '$@'"
+    carp "Error compiling " . $self->_module_path() . ": '$@'"
         and return()
             if( $@ );
 
@@ -138,13 +139,13 @@ sub _run
     # Attempt to pull coderef out of package namespace
     my $namespace = $self->_namespace();
     my $sub = \&{__PACKAGE__ . "::${namespace}::${funcname}"};
-    warn "No such module or function: '$namespace'::'$funcname'" and return
+    carp "No such module or function: '$namespace'::'$funcname'" and return
         unless( ref( $sub ) eq 'CODE' );
 
     # Attempt to execute coderef
     my @retvals = eval { $sub->( @args ) };  # Ahhh, block eval.
     chomp $@ if( $@ );
-    warn "Error executing ${namespace}::${funcname}: $@" and return
+    carp "Error executing ${namespace}::${funcname}: $@" and return
         if( $@ );
 
     return( @retvals );
@@ -158,7 +159,7 @@ sub _read_module_source
     my $path = $self->_module_path();
 
     open( my $fd, '<', $path )
-        or warn "$path is inaccessible: $!" and return( undef );
+        or carp "$path is inaccessible: $!" and return( undef );
     my $module_src = do { local $/; <$fd> };
     close( $fd );
 
@@ -170,7 +171,8 @@ sub _delete_namespace
     my( $self ) = @_;
 
     my $namespace = $self->_namespace();
-    my $wiped     = delete( $::{__PACKAGE__.'::'}{$namespace.'::'} );
+    no strict 'refs';
+    my $wiped     = delete( ${__PACKAGE__.'::'}{$namespace.'::'} );
 
     return( $wiped ? $TRUE : $FALSE );
 }
@@ -240,6 +242,14 @@ sub _set_last_load_time
 ###
 ### UTILITY ROUTINES
 ###
+
+# Overload the parent classes' _lang_ext, as we've stored this as an attr
+sub _lang_ext
+{
+    my( $self ) = @_;
+
+    return( $self->{lang_ext} );
+}
 
 # Return boolean if source file has been updated
 sub _issue_reload
@@ -321,31 +331,29 @@ It is a descendent class of Inline::Wrapper.
 
 =head1 METHODS
 
-=over 4
-
-=item B<new()>
+=head2 new()
 
 Takes the same arguments as Inline::Wrapper::New, but also requires a
 I<module_name> argument.
 
 Don't use this, it will croak if you try to use it directly.
 
-=item B<initialize()>
+=head2 initialize()
 
 Initialize the object instance.
 
-=item B<DESTROY()>
+=head2 DESTROY()
 
 Destructor to clean up the object instance, and the private code module
 namespace created.
 
-=back
-
 =head1 SEE ALSO
 
-L<Inline::Wrapper>
+L<Inline::Wrapper::Module>
 
 The L<Inline> documentation.
+
+The L<Inline::FAQ> list.
 
 The examples/ directory of this module's distribution.
 
@@ -361,7 +369,10 @@ Please kindly read through this documentation and the B<examples/>
 thoroughly, before emailing me with questions.  Your answer is likely
 in here.
 
-Jason McManus (infi) -- infidel@cpan.org
+Also make sure that your issue is actually with B<Inline::Wrapper> and not
+with L<Inline> itself.
+
+Jason McManus (INFIDEL) -- infidel@cpan.org
 
 =head1 LICENSE
 
@@ -374,4 +385,3 @@ distribution for details.
 =cut
 
 ### Thank you, drive through. ###
-

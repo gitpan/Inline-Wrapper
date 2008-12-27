@@ -2,7 +2,7 @@
 #
 #   Test Inline::Lua module creation
 #
-#   infi/08
+#   $Id: 23-Inline-Ruby.t 8 2008-12-27 19:16:54Z infidel $
 #
 
 use Test::More tests => 10;

@@ -2,10 +2,10 @@
 #
 #   Test Inline::Foo module creation
 #
-#   infi/08
+#   $Id: 20-Inline-Foo.t 8 2008-12-27 19:16:54Z infidel $
 #
 
-use Test::More tests => 9;
+use Test::More tests => 13;
 use File::Temp qw( tempdir );
 
 ###
@@ -51,6 +51,12 @@ is( @subs = $obj->load( $modname ),       1, "Loading of module $modname (1)");
 is( $subs[0],                       'test1', 'Function name correct (test1)' );
 is( $obj->run( $modname, 'test1', 'arglebargle' ),
                                           1, 'Function ran correctly (TRUE)' );
+
+# Tests: module deletion successful
+is( ($obj->modules())[0],            'dongs', 'Module name list correct' );
+is( ($obj->functions( 'dongs' ))[0], 'test1', 'Function list correct' );
+is( $obj->unload( 'dongs' ),         'dongs', 'Module deletion successful' );
+is( $obj->modules(),                       0, 'Module count correct (0)' );
 
 ###
 ### END OF TESTS

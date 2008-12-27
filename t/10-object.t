@@ -2,7 +2,7 @@
 #
 #   Test basic object functionality
 #
-#   infi/08
+#   $Id: 10-object.t 8 2008-12-27 19:16:54Z infidel $
 #
 
 use Test::More tests => 16;

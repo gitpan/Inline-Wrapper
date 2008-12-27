@@ -2,7 +2,7 @@
 #
 #   Test Inline::Lua module creation
 #
-#   infi/08
+#   $Id: 22-Inline-Lua.t 8 2008-12-27 19:16:54Z infidel $
 #
 
 use Test::More tests => 9;
@@ -56,7 +56,6 @@ is( @subs = $obj->load( $modname ),       1, "Loading of module $modname (1)");
 is( $subs[0],                       'power', 'Function name correct (power)' );
 is( ($obj->run( $modname, 'power', 2, 3 ))[0],
                                           8, 'Function ran correctly (8)' );
-
 }
 
 ####################
