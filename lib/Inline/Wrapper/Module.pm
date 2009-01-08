@@ -4,7 +4,7 @@ package Inline::Wrapper::Module;
 #
 #   Individual module handler object
 #
-#   $Id: Module.pm 8 2008-12-27 19:16:54Z infidel $
+#   $Id: Module.pm 12 2009-01-08 17:22:51Z infidel $
 #
 #   POD documentation after __END__
 #
@@ -21,7 +21,7 @@ use vars qw( $TRUE $FALSE $VERSION );
 ### VARS
 ###
 
-($VERSION) = q$Revision: 8 $ =~ /(\d+)/;
+($VERSION) = q$Revision: 12 $ =~ /(\d+)/;
 *TRUE    = \1;
 *FALSE   = \0;
 
@@ -324,19 +324,19 @@ Inline::Wrapper::Module - Internal object wrapper for individual Inline modules.
 
 =head1 DESCRIPTION
 
-Inline::Wrapper::Module is used internally by Inline::Wrapper, and should
-not be used directly.  It will croak if you attempt to do so.
+B<Inline::Wrapper::Module> is used internally by L<Inline::Wrapper>, and
+should not be used directly.  It will croak if you attempt to do so.
 
-It is a descendent class of Inline::Wrapper.
+It is a descendent class of L<Inline::Wrapper>.
 
 =head1 METHODS
 
 =head2 new()
 
-Takes the same arguments as Inline::Wrapper::New, but also requires a
-I<module_name> argument.
+Takes the same arguments as L<Inline::Wrapper/new()>, but also requires a
+I<module_name> and I<lang_ext> argument.
 
-Don't use this, it will croak if you try to use it directly.
+Don't use this.  It will croak if you try to use it directly.
 
 =head2 initialize()
 
@@ -344,12 +344,31 @@ Initialize the object instance.
 
 =head2 DESTROY()
 
-Destructor to clean up the object instance, and the private code module
-namespace created.
+Destructor to clean up the object instance, and wipe the private code
+module namespace created when binding the symbol list.
+
+=head1 INHERITANCE
+
+As B<Inline::Wrapper::Module> is an inherited class from L<Inline::Wrapper>,
+all methods that apply to the base class also apply to objects of this class.
+
+However, note that this has the following effects, due to the semantics of
+the B<load()>/B<run()> steps:
+
+I<auto_reload> settings vs. when effects take place:
+
+ auto_reload value:  |  FALSE          TRUE     
+ --------------------+------------------------------------------
+ set_base_dir()      |  no effect      after next reload / run()
+ set_language()      |  no effect      after next reload / run()
+ add_language()      |  no effect      after next reload / run()
+
+Please read through L<Inline::Wrapper/load()> and L<Inline::Wrapper/run()>
+for insight into why the implementation works like this.
 
 =head1 SEE ALSO
 
-L<Inline::Wrapper::Module>
+L<Inline::Wrapper>
 
 The L<Inline> documentation.
 
@@ -357,22 +376,16 @@ The L<Inline::FAQ> list.
 
 The examples/ directory of this module's distribution.
 
-=head1 ACKNOWLEDGEMENTS
-
-Thank you, kennethk and ikegami for your assistance on perlmonks.
-
-L<http://perlmonks.org/index.pl?node_id=732598>
-
 =head1 AUTHOR
 
 Please kindly read through this documentation and the B<examples/>
 thoroughly, before emailing me with questions.  Your answer is likely
 in here.
 
-Also make sure that your issue is actually with B<Inline::Wrapper> and not
-with L<Inline> itself.
+Also make sure that your issue is actually with the L<Inline::Wrapper>
+modules, and not with L<Inline> itself.
 
-Jason McManus (INFIDEL) -- infidel@cpan.org
+Jason McManus (INFIDEL) -- C<< infidel AT cpan.org >>
 
 =head1 LICENSE
 

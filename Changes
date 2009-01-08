@@ -2,10 +2,13 @@ Revision history for Inline-Wrapper
 ------------------------------------------------------------
 Legend:
 BUG:    An actual found or reported bug fix.
-FIX:    Correction toward correct behavior, but unreported.
+FIX:    Change toward correct behavior, but unreported.
 DOC:    Changes to documentation.
 NEW:    New, previously non-existent feature.
 ------------------------------------------------------------
+
+0.04    Jan 09, 2008
+        DOC: Cleaned up and clarified documentation throughout.
 
 0.03    Dec 27, 2008
         NEW: Added Inline::Wrapper->unload() method to unload modules, and

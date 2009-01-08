@@ -3,27 +3,31 @@ Inline-Wrapper
 Inline::Wrapper provides wrapper routines to make embedding another
 language into a Perl application more convenient.
 
-Instead of having to include the external code in after __END__ in Perl
-source code, you can have separate, individually configurable language
-module directories to contain all of your code.
+Instead of having to include the external code after __END__ in your Perl
+source code, you can have separate, individually-configurable language
+module directories to contain and organize all of your code.
 
 
 Inline::Wrapper provides the following features:
 
-* Support for all languages that Inline.pm supports.
-* A single, unified interface to running loaded module functions.
+* Transparent support for all languages supported by Inline.pm
+* A single, unified interface for loading and running module functions.
 * Loading of files containing pure source code, only in their respective
-    language.
-* Individually configurable module directories.
+        languages, so you can isolate maintenance and management of these
+        modules.
+* Individually-configurable module directories.
 * Automatic, run-time module reloading upon file modification time
-    detection.
-* No more namespace pollution.
+        detection.
+* No more namespace pollution.  All module symbols are loaded into their own
+        individual, private namespaces, so they won't collide with your code
+        or each other.
+
 
 See the Changes file for release information.
 
 INSTALLATION
 
-To install this module, run the following commands:
+To install this module, follow the standard CPAN mantra:
 
 	perl Makefile.PL
 	make

@@ -2,7 +2,7 @@ package Inline::Wrapper;
 #
 #   Inline::* module dynamic loader and useful wrapper routines
 #
-#   $Id: Wrapper.pm 8 2008-12-27 19:16:54Z infidel $
+#   $Id: Wrapper.pm 12 2009-01-08 17:22:51Z infidel $
 #
 #   POD documentation after __END__
 #
@@ -19,7 +19,7 @@ use Inline::Wrapper::Module;                        # individual code modules
 ### VARS
 ###
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 *TRUE    = \1;
 *FALSE   = \0;
 
@@ -33,6 +33,11 @@ my $LANGS = {
     Foo         => '.foo',              # built in to Inline's distro
     C           => '.c',
     Lua         => '.lua',
+#    'C++'       => '.cpp',
+#    Java        => '.java',
+#    Python      => '.py',
+#    Tcl         => '.tcl',
+#    Ruby        => '.rb',
 };
 
 my $PARAMS = {
@@ -100,6 +105,8 @@ sub load
     my %args = @args;
 
     # Check for duplicate modules, return @function list if found
+    # XXX: Possible bug; should probably issue reload if auto_reload
+    #   ends up being set to true.
     if( my $temp_module = $self->_module( $modname ) )
     {
         my $temp_lang     = $args{language} || $self->language();
@@ -362,7 +369,7 @@ embedding functions from another language into a Perl application much
 more convenient.
 
 Instead of having to include the external code in a Perl source file after
-the B<__END__> directive, B<Inline::Wrapper> allows you to have separate,
+the __END__ directive, B<Inline::Wrapper> allows you to have separate,
 individually-configurable module repositories to more easily manage all
 of your external application code.
 
@@ -374,11 +381,11 @@ B<Inline::Wrapper> provides the following features:
 
 =item * Support for all languages supported by L<Inline>.
 
-=item * A single, unified interface for running loaded module functions.
+=item * A single, unified interface for loading and running module functions.
 
 =item * Loading of files containing pure source code, only in their
-respective language, so you can outsource maintenance of these modules to
-another party.
+respective languages, so you can isolate maintenance and management of these
+modules.
 
 =item * Individually-configurable module directories.
 
@@ -404,41 +411,42 @@ code or each other.
 Create a new B<Inline::Wrapper> object, with the appropriate attributes (if
 specified).
 
-B<ARGUMENTS>:
+B<ARGUMENTS:>
 
-All arguments are of the hash form  Var => Value.  L</"new()"> will complain
+All arguments are of the hash form  Var => Value.  L</new()> will complain
 and croak if they do not follow this form.
 
-B<NOTE:> The arguments to L</"new()"> become the defaults used by
-L</"load()">.  You can individually configure loaded modules using
-L</"load()">, as well.
+The arguments to L</new()> become the defaults used by L</load()>.  You can
+individually configure loaded modules using L</load()>, as well.
 
 =over 4
 
-=item I<language>           [ default: B<Lua> ]
+=item I<language>           [ default: B<'Lua'> ]
 
-Set to the default language for which you wish to load modules, if not
-explicitly specified via L</"load()">.
+Optional.  Set to the default language for which you wish to load modules,
+if not explicitly specified via L</load()>.
 
 B<NOTE>: It defaults to Lua because that is what I wrote this module for.
 Just pass in the argument if you don't like that.
 
 B<ALSO NOTE:> Currently only a couple of "known" languages are hard-coded
 into this module.  If you wish to use others, don't pass this argument, and
-use the L</"add_language()"> method after the object has been instantiated.
+use the L</add_language()> method after the object has been instantiated.
 
 =item I<auto_reload>        [ default: B<FALSE> ]
 
-Set to a TRUE value to default to automatically checking if modules have
-been changed since the last L</"load()">, and reload them if necessary.
+Optional.  Set to a TRUE value to default to automatically checking if
+modules have been changed since the last L</load()>, and reload them if
+necessary.
 
 =item I<base_dir>           [ default: B<'.'> ]
 
-Set to the default base directory from which you wish to load all modules.
-
-B<RETURNS>: blessed $object, or undef on failure.
+Optional.  Set to the default base directory from which you wish to load all
+modules.
 
 =back
+
+B<RETURNS>: blessed $object, or undef on failure.
 
 =head1 METHODS
 
@@ -446,31 +454,31 @@ B<RETURNS>: blessed $object, or undef on failure.
 
     $obj->initialize();
 
-Initialize arguments.  If you are subclassing, overload this, not L</"new()">.
+Initialize arguments.  If you are subclassing, overload this, not L</new()>.
 
-Generally only called from within L</"new()">.
+Generally only called from within L</new()>.
 
 =head2 load()
 
-    my @functions = $obj->load( $modname, %args );
+    my @functions = $obj->load( $modname, %arguments );
 
 The workhorse.  Loads the actual module referred to by I<$modname>,
 imports its symbols into a private namespace, and makes them available to
-call via L</"run()">.
+call via L</run()>.
 
 B<ARGUMENTS:>
 
 I<$modname> is REQUIRED.  It corresponds to the base filename, without
 extension, loaded from the I<base_dir>.  See the
-L</"Details of steps taken by load()"> section, Step 3, for clarification
+L</Details of steps taken by load()> section, Step 3, for clarification
 of how pathname resolution is done.  I<$modname> is also how you will refer
 to this particular module from your program, so keep track of it.
 
-This method accepts all of the same arguments as L</"new()">.  Thus, you can
-set the defaults via L</"new()">, yet still individually configure module
+This method accepts all of the same arguments as L</new()>.  Thus, you can
+set the defaults via L</new()>, yet still individually configure module
 components differently from the defaults, if desired.
 
-Returns a list of @functions made available by loading $modname, or warns
+Returns a list of @functions made available by loading I<$modname>, or warns
 and returns an empty list if unsuccessful.
 
 =head3 Details of steps taken by load()
@@ -481,29 +489,30 @@ when loading the module, doing pathname resolution, etc.
 =over 4
 
 =item 1. Checks to see if the specified module has already been loaded, and
-if so, returns the list of available functions in that module immediately.
+if so, returns the list of functions loaded and available in that module
+immediately.
 
 =item 2. Creates a new L<Inline::Wrapper::Module> container object with any
-supplied %arguments, or the defaults you specified with L</"new()">.
+supplied %arguments, or the defaults you specified with L</new()>.
 
-=item 3. Constructs a path to the specified $modname, as follows:
+=item 3. Constructs a path to the specified $modname, roughly as follows:
 
-    $base_dir + $path_separator + $modname + $lang_ext
+    join( $PATH_SEP, $base_dir , $modname . $lang_ext );
 
 =over 4
 
 =item I<$base_dir> is taken either from the default created with
-L</"new()">, or the explicitly supplied base_dir argument to L</"load()">.
+L</new()>, or the explicitly supplied I<base_dir> argument to L</load()>.
 
 =item I<$path_separator> is just the appropriate path separator for your OS.
 
 =item I<$modname> is your supplied module name.  Note that this means that you
-can supply your own subdirectories, as well.  'foo' is just as valid as
-'foo/bar/baz'.
+can supply your own subdirectories, as well; i.e. I<'foo'> is just as valid as
+I<'foo/bar/baz'>.
 
 =item I<$lang_ext> is taken from a data structure that defaults to
-common-sense filename extensions on a per-language basis.  Any of these can
-be overridden via the L</"add_language()"> method.
+common filename extensions on a per-language basis.  Any of these can
+be overridden via the L</add_language()> method.
 
 =back
 
@@ -527,8 +536,8 @@ of loaded, available functions provided by the module.
 Completely unload the module identified by I<$modname>, and render its
 functions uncallable.
 
-This will actually go through and destroy L<Inline::Wrapper::Module> object,
-as well as the code module's corresponding private namespace.
+This will actually go destroy the L<Inline::Wrapper::Module> object, as
+well as the code module's corresponding private namespace.
 
 Returns I<$modname> (TRUE) upon success, carps and returns undef on failure.
 
@@ -539,6 +548,10 @@ Returns I<$modname> (TRUE) upon success, carps and returns undef on failure.
 Run the named I<$function> that you loaded from I<$modname>, with the
 specified I<@arguments> (if any).
 
+B<NOTE:> If the I<auto_reload> option is TRUE, run() will also attempt to
+reload the source script from disk before running the function, if the
+ctime of the file has changed since the last run.
+
 Assuming a successful compilation (you are checking for errors, right?),
 this will execute the function provided by the loaded module.  Call syntax
 and everything is up to the function provided.  This simply executes the sub
@@ -546,8 +559,8 @@ that L<Inline> loaded as-is, but in its own private namespace to keep your
 app clean.
 
 Returns I<@retvals>, consisting of the actual return values provided by
-the module function itself.  Whatever the function returns in its native
-language, that's what you get.
+the module function itself.  Whatever the function returns, that's what
+you get.
 
 =head2 modules()
 
@@ -587,8 +600,8 @@ B<NOTE:> Only affects modules loaded I<after> this setting was made.
 
     my $bool = $obj->auto_reload();
 
-Returns a $boolean as to whether or not the current default I<auto_reload>
-setting is enabled for new modules.
+Returns a $boolean as to whether or not the default I<auto_reload> setting
+is enabled for new modules.
 
 =head2 set_auto_reload()
 
@@ -616,20 +629,20 @@ B<NOTE:> Only affects modules loaded I<after> this setting was made.
 
 B<ALSO NOTE:> This checks for "valid" languages via a pretty naive method.
 Currently only a couple are hard-coded.  However, you can add your own
-languages via the L</"add_language()"> method.
+languages via the L</add_language()> method.
 
 =head2 add_language()
 
     $obj->add_language( 'Lojban' => '.xkcd' );
 
 Adds a language to the "known languages" table, allowing you to later use
-L</"set_language()">.
+L</set_language()>.
 
-This can also be used to set a new extension to an existing language.
+This can also be used to set a new file extension for an existing language.
 
 REQUIRES a I<$language> name (e.g. 'Python') and a filename I<$extension>
 (e.g. '.py'), which will be used in pathname resolution, as described under
-L</"load()">.
+L</load()>.
 
 Returns TRUE if successful, carps and returns FALSE otherwise.
 
@@ -655,10 +668,10 @@ Please kindly read through this documentation and the B<examples/>
 thoroughly, before emailing me with questions.  Your answer is likely
 in here.
 
-Also make sure that your issue is actually with B<Inline::Wrapper> and not
-with L<Inline> itself.
+Also, please make sure that your issue is actually with B<Inline::Wrapper>
+and not with L<Inline> itself.
 
-Jason McManus (INFIDEL) -- infidel@cpan.org
+Jason McManus (INFIDEL) -- C<< infidel AT cpan.org >>
 
 =head1 LICENSE
 
