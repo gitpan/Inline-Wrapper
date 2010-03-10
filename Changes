@@ -7,7 +7,14 @@ DOC:    Changes to documentation.
 NEW:    New, previously non-existent feature.
 ------------------------------------------------------------
 
-0.04    Jan 09, 2008
+0.05    Mar 10, 2010
+        BUG: New package stash format contains reference to own module;
+            needed to grep it out of the package.
+            Example: http://www.cpantesters.org/cpan/report/6914196
+        DOC: Cleaned up 2 bad links in generated POD documentation
+        DOC: Corrected wrong year (2008) on below 0.04 release.  Silly.
+
+0.04    Jan 09, 2009
         DOC: Cleaned up and clarified documentation throughout.
 
 0.03    Dec 27, 2008

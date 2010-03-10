@@ -2,7 +2,7 @@ package Inline::Wrapper;
 #
 #   Inline::* module dynamic loader and useful wrapper routines
 #
-#   $Id: Wrapper.pm 12 2009-01-08 17:22:51Z infidel $
+#   $Id: Wrapper.pm 14 2010-03-10 09:08:18Z infidel $
 #
 #   POD documentation after __END__
 #
@@ -19,7 +19,7 @@ use Inline::Wrapper::Module;                        # individual code modules
 ### VARS
 ###
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 *TRUE    = \1;
 *FALSE   = \0;
 
@@ -652,7 +652,7 @@ L<Inline::Wrapper::Module>
 
 The L<Inline> documentation.
 
-The L<Inline::FAQ> list.
+The L<Inline-FAQ> list.
 
 The examples/ directory of this module's distribution.
 

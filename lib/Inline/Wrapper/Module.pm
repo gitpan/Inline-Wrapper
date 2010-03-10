@@ -4,7 +4,7 @@ package Inline::Wrapper::Module;
 #
 #   Individual module handler object
 #
-#   $Id: Module.pm 12 2009-01-08 17:22:51Z infidel $
+#   $Id: Module.pm 14 2010-03-10 09:08:18Z infidel $
 #
 #   POD documentation after __END__
 #
@@ -21,7 +21,7 @@ use vars qw( $TRUE $FALSE $VERSION );
 ### VARS
 ###
 
-($VERSION) = q$Revision: 12 $ =~ /(\d+)/;
+($VERSION) = q$Revision: 14 $ =~ /(\d+)/;
 *TRUE    = \1;
 *FALSE   = \0;
 
@@ -97,11 +97,15 @@ sub _load
 
     # Try to bind via Inline::$language
     $self->_delete_namespace();
+    # BugFix: For some reason, the package stash changed between
+    # 5.11.1 and >= 5.11.1 commit-id 81693ff90925b7d196d1f339fa6f85555e38cab7
+    # Needed to add own module name into the grep -v list.
     my $code = sprintf(q#package %s::%s;
                          use Inline;
                          Inline->bind( %s => $module_src );
                          package %s;
-                         return( grep { !/^(?:BEGIN|ISA)$/ } keys %%%s::%s:: )#,
+                         return( grep { !/^(?:BEGIN|ISA|Inline)$/ }
+                                 keys %%%s::%s:: )#,
                         __PACKAGE__,        $namespace,
                         $self->language(),
                         __PACKAGE__,
@@ -110,10 +114,12 @@ sub _load
     # DEAR LORD, STRING EVAL!  RUN AWAY!
     # http://perlmonks.org/index.pl?node_id=732598
     my @symbols = eval $code;
-    chomp $@ if( $@ );
-    carp "Error compiling " . $self->_module_path() . ": '$@'"
-        and return()
-            if( $@ );
+    if( $@ )
+    {
+        chomp $@;
+        carp "Error compiling " . $self->_module_path() . ": '$@'";
+        return();
+    }
 
     # Update our state
     $self->_set_function_list( @symbols );
@@ -139,13 +145,13 @@ sub _run
     # Attempt to pull coderef out of package namespace
     my $namespace = $self->_namespace();
     my $sub = \&{__PACKAGE__ . "::${namespace}::${funcname}"};
-    carp "No such module or function: '$namespace'::'$funcname'" and return
+    carp "No such module or function: '$namespace'::'$funcname'", return
         unless( ref( $sub ) eq 'CODE' );
 
     # Attempt to execute coderef
     my @retvals = eval { $sub->( @args ) };  # Ahhh, block eval.
     chomp $@ if( $@ );
-    carp "Error executing ${namespace}::${funcname}: $@" and return
+    carp "Error executing ${namespace}::${funcname}: $@", return
         if( $@ );
 
     return( @retvals );
@@ -159,7 +165,7 @@ sub _read_module_source
     my $path = $self->_module_path();
 
     open( my $fd, '<', $path )
-        or carp "$path is inaccessible: $!" and return( undef );
+        or carp "$path is inaccessible: $!", return( undef );
     my $module_src = do { local $/; <$fd> };
     close( $fd );
 
@@ -355,7 +361,7 @@ all methods that apply to the base class also apply to objects of this class.
 However, note that this has the following effects, due to the semantics of
 the B<load()>/B<run()> steps:
 
-I<auto_reload> settings vs. when effects take place:
+I<auto_reload> settings vs. when method effects take place:
 
  auto_reload value:  |  FALSE          TRUE     
  --------------------+------------------------------------------
@@ -372,7 +378,7 @@ L<Inline::Wrapper>
 
 The L<Inline> documentation.
 
-The L<Inline::FAQ> list.
+The L<Inline-FAQ> list.
 
 The examples/ directory of this module's distribution.
 
